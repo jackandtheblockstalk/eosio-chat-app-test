@@ -28,7 +28,6 @@ class Login extends React.Component {
     event.preventDefault();
     // 2. get the text from that input
     const userName = this.myUsername.current.value;
-    debugger;
     console.log(this.state.chatRoomName);
     const chatroomName = this.state.chatRoomName
     // 3. Change the page to /chatapp/whatever-they-entered

@@ -2,10 +2,13 @@ import React from "react";
 import PropTypes from "prop-types";
 import Eos from 'eosjs';
 import './App.css';
-import Header from '../Header/Header'
+import HeaderComponent from '../HeaderComponent/HeaderComponent'
 import Messages from '../Messages/Messages';
 import ChatInput from '../ChatInput/ChatInput';
 import base from "../../base";
+import { Layout, Menu, Breadcrumb } from 'antd';
+
+const { Content, Footer } = Layout;
 
 
 class App extends React.Component {
@@ -38,16 +41,22 @@ class App extends React.Component {
 
   render() {
     return (
-        <div id="eos-chat-app-test">
-          <Header userId={this.state.userId} chatRoomName={this.state.chatRoomName} />
-          <Messages messages={this.state.messages} />
-          <ChatInput userId={this.state.userId} chatRoomName={this.state.chatRoomName} sendMessage={this.sendMessage} />
-        </div>
-        
-      );
-    }
-  
-}
 
+
+<Layout className="layout" id="eos-chat-app-test"> 
+<HeaderComponent userId={this.state.userId} chatRoomName={this.state.chatRoomName} />
+<Content style={{ padding: '0 50px' }}>
+  <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+    <Messages messages={this.state.messages} />
+    <ChatInput userId={this.state.userId} chatRoomName={this.state.chatRoomName} sendMessage={this.sendMessage} />
+  </div>
+</Content>
+<Footer style={{ textAlign: 'center' }}>
+  EOS Hackathon team - test chat app
+</Footer>
+</Layout>
+    );  
+}
+}
 export default App;
 

@@ -19,17 +19,7 @@ export function getChatroomNames() {
       "tomatoes",
       "cacti",
       "foci",
-      "fungi",
-      "nuclei",
-      "syllabuses",
-      "analyses",
-      "diagnoses",
-      "oases",
-      "theses",
-      "crises",
-      "phenomena",
-      "criteria",
-      "data"
+      "fungi"
     ];
   
     return roomNames;
