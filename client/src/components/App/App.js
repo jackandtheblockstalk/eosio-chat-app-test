@@ -6,6 +6,8 @@ import Header from '../Header/Header'
 import Messages from '../Messages/Messages';
 import ChatInput from '../ChatInput/ChatInput';
 import base from "../../base";
+import { sendMsg, getMsg } from "../../ipfs";
+import { sendSha } from "../../messengerContract";
 
 
 class App extends React.Component {
@@ -15,11 +17,14 @@ class App extends React.Component {
     messages: {}
   }
 
-  sendMessage = message => {
+  sendMessage = async message => {
     console.log('Send message');
     const messages = {...this.state.messages};
     messages[`message${Date.now()}`] = message;
     this.setState({ messages });
+    const hash = await sendMsg('messages')
+    await getMsg(hash)
+    sendSha(hash)
   }
 
   componentDidMount() {
