@@ -5,6 +5,7 @@
   "dependencies": {
     "eosjs": "^16.0.6",
     "firebase": "^5.4.2",
+    "ipfs-api": "^24.0.1",
     "prop-types": "^15.6.2",
     "re-base": "^4.0.0",
     "react": "^16.4.2",
