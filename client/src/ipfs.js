@@ -8,10 +8,11 @@ async function sendMsg (msg) {
   let res
   try {
     res = await ipfs.add(buffer);
+    console.log(res)
   } catch (err) {
     console.log('Failed to add to ipfs', err)
   }
-  console.log(res)
+
   return res[0].hash
 }
 
