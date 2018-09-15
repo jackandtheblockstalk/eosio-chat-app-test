@@ -2,20 +2,20 @@
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/crypto.h>
 #include <string>
+#include <vector>
 
 using eosio::indexed_by;
 using eosio::const_mem_fun;
 using std::string;
-
+using std::vector;
 
 class messenger : public eosio::contract {
 public:
    explicit messenger( action_name self )
-         : contract( self ) {
-   }
+         : contract( self ){}
 
    //@abi action
-   void sendsha( account_name from, std::string to, uint64_t msg_id, const checksum256& msg_sha, std::string timestamp ) {
+   void sendsha( account_name from, string to, uint64_t msg_id, const checksum256& msg_sha, string timestamp ) {
       // if not authorized then this action is aborted and transaction is rolled back
       // any modifications by other actions in same transaction are undone
       require_auth( from ); // make sure authorized by account
@@ -60,13 +60,13 @@ public:
       // verify already exist
       auto itr = messages.find( msg_id );
       if( itr == messages.end() ) {
-         std::string err = "Message does not exist: " + std::to_string(msg_id);
+         string err = "Message does not exist: " + std::to_string(msg_id);
          eosio_assert( false, err.c_str() );
       }
 
       // verify correct to
       if( itr->to != to ) {
-         std::string err = "Message with id " + std::to_string(msg_id) + " is to: " +
+         string err = "Message with id " + std::to_string(msg_id) + " is to: " +
                eosio::name{itr->to}.to_string() + " not: " + eosio::name{to}.to_string();
          eosio_assert( false, err.c_str() );
       }
@@ -91,30 +91,46 @@ public:
    }
 
    //@abi action
-   void printmsg( account_name other ) {
-      message_index messages( other, other ); // code, scope
+   void getChatroom( account_name other, string room ) {
+         
+         message_index timestampOrdered( other, other ); // code, scope
 
-      for (auto& msg : messages) {
-         eosio::print("from: ", eosio::name{msg.from}, ", to: ", eosio::name{msg.to}, "\n");
+         auto ordered = timestampOrdered.get_index<N(timestamp)>();
+
+         for (auto& item : ordered) {
+
+            if (item.to == room) {
+
+                  print(item.msg_sha);
+
+            }
+
       }
-   }
-
-   //@abi action
-   void getChatroom( std::string room ) {
-     
-      auto rooms = message_index.get_index<N(byTimestamp)>();
-
-         for (auto& item : rooms) {
-
-               if (item.to == room) {
-
-                     print(item.by_sha());
-
-               }
-
-         }
       
    }
+
+ /*  //@abi action
+   std::vector<string> getChatroomVector(string room) {
+
+        vector<string> msg;
+
+        message_index timestampOrdered( other, other ); // code, scope
+
+        auto ordered = timestampOrdered.get_index<N(timestamp)>();
+
+        for (auto& item : ordered) {
+
+            if (item.to == room) {
+
+                  msg.push_back(item.by_sha()); 
+
+            }
+
+      } 
+
+      return msg;
+
+   } */
 
 private:
 
@@ -122,15 +138,15 @@ private:
    struct message {
       uint64_t msg_id;       // unique identifier for message
       account_name from;     // account message sent from
-      std::string to;       // account message sent to
+      string to;        // account message sent to
       checksum256 msg_sha;   // sha256 of message string
-      std::string timestamp; //timestamp of message
+      string timestamp; //timestamp of message
 
       uint64_t primary_key() const { return msg_id; }
 
-      uint64_t by_timestamp() const { return timestamp; } // getter for timestamp
+      string by_timestamp() const { return timestamp; } // getter for timestamp
 
-      std::string by_room() const { return to; } // getter for room
+      string by_room() const { return to; } // getter for room
 
       eosio::key256 by_sha() const { return to_key( msg_sha ); }
 
@@ -139,14 +155,14 @@ private:
          return eosio::key256::make_from_word_sequence<uint64_t>( ui64[0], ui64[1], ui64[2], ui64[3] );
       }
 
-      EOSLIB_SERIALIZE( message, ( msg_id )( from )( to )( msg_sha )(timestamp) )
+    //  EOSLIB_SERIALIZE( message, ( msg_id )( from )( to )( msg_sha )( timestamp ) )
 
    };
 
    typedef eosio::multi_index<N( message ), message,
-         indexed_by<N( byTimestamp ), const_mem_fun<message, std::string, &message::by_timestamp>>
+         indexed_by<N( timestamp ), const_mem_fun<message, string, &message::by_timestamp>>
    > message_index;
 
 };
 
-EOSIO_ABI( messenger, ( sendsha )( removemsg )( removesha )( printmsg )( getChatroom ))
+EOSIO_ABI( messenger, ( sendsha )( removemsg )( removesha )( getChatroom ))
