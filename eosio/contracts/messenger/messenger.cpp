@@ -17,7 +17,7 @@ public:
    }
 
    //@abi action
-   void sendsha( account_name from, string to, uint64_t msg_id, const checksum256& msg_sha, uint64_t timestamp ) {
+   void sendsha( account_name from, string to, uint64_t msg_id, const string msg_sha, uint64_t timestamp ) {
       // if not authorized then this action is aborted and transaction is rolled back
       // any modifications by other actions in same transaction are undone
       require_auth( from ); // make sure authorized by account
@@ -52,12 +52,12 @@ public:
       message_index messages( other, other ); // code, scope
 
       for (auto& msg : messages) {
-         print("from: ", eosio::name{msg.from}, ", to: ", msg.to, "\n");
+         eosio::print("from: ", eosio::name{msg.from}, ", to: ", msg.to, "\n");
       }
    }
 
    //@abi action
-   void getChatroom(account_name other, string room) {
+   void getchatroom(account_name other, string room) {
 
         message_index timestampOrdered( other, other ); // code, scope
 
@@ -65,9 +65,9 @@ public:
 
         for (auto& item : ordered) {
 
-            if (item.to == room) {
+            if (item.by_room().compare(room)) {
 
-               print(item.by_sha().to_string());
+               eosio::print(item.msg_sha);
 
             }
 
@@ -83,7 +83,7 @@ private:
       uint64_t msg_id;      // unique identifier for message
       account_name from;    // account message sent from
       string to;      // account message sent to
-      checksum256 msg_sha;  // sha256 of message string
+      string msg_sha;  // sha256 of message string
       uint64_t timestamp; //timestamp of message
 
       uint64_t primary_key() const { return msg_id; }
@@ -92,14 +92,7 @@ private:
 
       string by_room() const { return to; } // getter for room
 
-      eosio::key256 by_sha() const { return to_key( msg_sha ); }
-
-      static eosio::key256 to_key( const checksum256& msg_sha ) {
-
-         const uint64_t* ui64 = reinterpret_cast<const uint64_t*>(&msg_sha);
-         return eosio::key256::make_from_word_sequence<uint64_t>( ui64[0], ui64[1], ui64[2], ui64[3] );
-
-      }
+      string by_sha() const { return msg_sha; } //getter for msg_sha
 
       EOSLIB_SERIALIZE( message, ( msg_id )( from )( to )( msg_sha )( timestamp ) )
 
@@ -111,4 +104,4 @@ private:
 
 };
 
-EOSIO_ABI( start, ( sendsha )( printmsg )( getChatroom ))
+EOSIO_ABI( start, ( sendsha )( printmsg )( getchatroom ))
